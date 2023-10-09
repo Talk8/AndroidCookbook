@@ -2,9 +2,10 @@ package com.android.cookbook.KotlinBasic
 
 fun main() {
 
-    var v1 = Animal("dog",1);
-    var v2 = Animal("cat",2)
-    var v4 = Animal();
+    //var定义变量，val定义常量
+    val v1 = Animal("dog",1);
+//    var v2 = Animal("cat",2)
+    val v4 = Animal();
 
     var v3 = v1;
     if (v1 == v3) {
