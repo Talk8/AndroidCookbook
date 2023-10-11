@@ -13,6 +13,11 @@
         android:theme="@style/Theme.Cookbook"
         tools:targetApi="31">
         <activity
+            android:name=".pages.Ex002ActivityText"
+            android:exported="false"
+            android:label="@string/title_activity_ex002_text"
+            android:theme="@style/Theme.Cookbook" />
+        <activity
             android:name=".pages.Ex001ActivityLayoutAndPage"
             android:exported="false"
             android:label="@string/title_activity_ex001_layout_and_page"
