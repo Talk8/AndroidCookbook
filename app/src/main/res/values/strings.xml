@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">cookbook</string>
     <string name="title_activity_ex001_layout_and_page">Ex001ActivityLayoutAndPage</string>
+    <string name="str_hello">Hello Compose,hello android,hello world</string>
 </resources>

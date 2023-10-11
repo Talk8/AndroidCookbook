@@ -2,20 +2,35 @@ package com.android.cookbook
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,11 +44,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.android.cookbook.ui.theme.CookbookTheme
+import kotlinx.coroutines.selects.select
+import java.lang.reflect.Type
+import kotlin.math.log
 
 class MainActivity : ComponentActivity() {
+
+   private val todoViewModel by viewModels<TodoViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -43,10 +80,34 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainFramework()
+
+
+                        MainFramework()
+//                    TodoActivityScreen()
                 }
             }
         }
+    }
+
+
+    @Composable
+    fun TodoActivityScreen() {
+        /*
+        val items = listOf(
+            TodoItem("Learn compose",TodoIcon.Event),
+            TodoItem("Take the codelab",TodoIcon.Square),
+            TodoItem("make the lab",TodoIcon.Trash),
+            TodoItem("Take the codelab",TodoIcon.Done),
+            TodoItem("This is the time",TodoIcon.Privacy),
+
+        )
+        TodoScreen(items)
+         */
+//        val  items: List<TodoItem> by todoViewModel.todoItems.observe(todoViewModel.todoItems,
+//            Observer<List<TodoViewModel>> { todoViewModel.todoItems })
+//        TodoScreen(items = todoViewModel,
+//            onAddItem = todoViewModel.addItem(it),
+//            onRemoveItem = todoViewModel.removeItem(it) )
     }
 }
 
@@ -81,6 +142,7 @@ fun MainFramework () {
     }
 }
 
+@OptIn(ExperimentalUnitApi::class)
 @Composable
 fun HomePage(padding:PaddingValues) {
     //用来存放目录，这些目录会显示到按钮上
@@ -90,7 +152,7 @@ fun HomePage(padding:PaddingValues) {
         "ex001: Layout and Pages",
         "ex001: Layout and Pages",
     )
-    
+
     Column(
         modifier = Modifier
             .padding(padding)
@@ -104,7 +166,8 @@ fun HomePage(padding:PaddingValues) {
                 modifier = Modifier
                 .padding(start = 16.dp, end = 16.dp)) {
                 Icon(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
                         .background(color = Color.White),//这里修改的是图标背景颜色，tint可以修改图标颜色
                     tint = Color.Blue,
                     imageVector = Icons.Default.Check, contentDescription =null )
@@ -113,10 +176,215 @@ fun HomePage(padding:PaddingValues) {
                     onClick = {
                     //按钮事件就用来跳转页面
                     Log.d("a", "ex $item")
+
                 }) {
                     Text(text = item)
                 }
             }
+        }
+
+
+        //WR,自动创建row,WC自动创建column
+        //comp自动创建组合函数
+
+        Box ( contentAlignment = Alignment.Center) {
+            Text(
+                modifier = Modifier
+                    .width(220.dp)
+                    .height(100.dp)
+                    .padding(8.dp) //padding位于border不同地方作用不同，这里是外边距，下面是内边距
+                    .background(color = Color.Yellow)
+                    .border(2.dp, color = Color.Red, shape = RectangleShape)
+                    .padding(16.dp),
+                text = stringResource(id = R.string.str_hello),
+                //这个颜色的优先级高于style
+//                color = Color.Blue,
+                textAlign = TextAlign.Center,
+                fontSize = 22.sp,
+                maxLines = 2,
+                //字符超过最大行后仍然无法显示时显示为三个点
+                overflow = TextOverflow.Ellipsis,
+                //使用的是ui.theme目录下的主题:type.kt中的style
+                style = MaterialTheme.typography.labelLarge
+            )
+        }
+
+        //可以选择的文本，主要是嵌套了一个SelectionContainer函数，icon嵌套后不能被选择
+        //如何操作复制事件？
+        SelectionContainer() {
+            Text(text = "hello")
+//            Row {
+//                Icon(imageVector = Icons.Default.Star, contentDescription = null)
+//                Icon(imageVector = Icons.Default.Star, contentDescription = null)
+//                Icon(imageVector = Icons.Default.Star, contentDescription = null)
+//            }
+        }
+
+        //富文本
+        Text(text = buildAnnotatedString {
+            withStyle( style = SpanStyle(color = Color.Red, fontSize = 12.sp)) {
+                append("part1")
+            }
+
+            withStyle( style = SpanStyle(color = Color.Green, fontSize = 22.sp)) {
+                append("part2")
+            }
+
+            withStyle( style = SpanStyle(color = Color.Blue)) {
+                append("part3")
+            }
+        })
+
+
+        //带有点击功能的文本
+        val annotationText = buildAnnotatedString {
+                withStyle(style = SpanStyle(fontSize = 24.sp)) {
+                    append("url:")
+                }
+
+                withStyle(
+                    style = SpanStyle(color = Color.Red, textDecoration = TextDecoration.Underline)
+                ) {
+                    pushStringAnnotation(
+                        tag = "URL",
+                        annotation = "www.baidu.com",
+                    )
+                    append("address")
+                    pop()
+                }
+        }
+
+        ClickableText(text = annotationText,
+            onClick = {
+                offset -> annotationText.getStringAnnotations(
+                tag = "URL",
+                start = offset,
+                end = offset
+                ).toString()
+                Log.d("tag","text is clicked : ${annotationText.toString()}")
+            }
+        )
+    }
+
+}
+
+
+
+@Composable
+fun TodoScreen(
+    items: List<TodoItem>,
+    onAddItem:(TodoItem) -> Unit,
+    onRemoveItem: (TodoItem) -> Unit,
+) {
+
+    val count = items.size
+    Column() {
+
+        LazyColumn(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .background(color = Color.Green),
+            contentPadding = PaddingValues(top = 8.dp),
+        ) {
+            items(count = count) {
+                TodoRow(
+                    todo = items[it],
+                    onItemClicked = {onRemoveItem(it)}
+                )
+            }
+        }
+
+        Button(
+            onClick = {onAddItem(generateRandomTodoItem())},
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
+            Text(text = "Add item")
+        }
+    }
+}
+
+@Composable
+fun TodoRow(
+    todo:TodoItem,
+    onItemClicked: (TodoItem)->Unit,
+//    modifier: Modifier = Modifier,
+
+) {
+
+    Row(
+        modifier = Modifier
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .fillMaxWidth()
+            .clickable { onItemClicked(todo) }
+            .background(color = Color.Yellow),
+        //行内元素的对齐方式,不起作用
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(text = todo.name)
+
+        Icon(
+            imageVector = todo.icon.imageVector,
+            contentDescription = null
+//            contentDescription = Text(text = todo.icon.contentDescription)
+        )
+    }
+}
+
+enum class TodoIcon(
+    val imageVector: ImageVector,
+    val contentDescription:String
+) {
+    Square(Icons.Default.AccountBox,"Expand"),
+    Done(Icons.Default.Done,"Done"),
+    Event(Icons.Default.MoreVert,"Event"),
+    Privacy(Icons.Default.Share,"Privacy"),
+    Trash(Icons.Default.Star,"Trash");
+
+    companion object {
+        val Default = Square
+    }
+}
+
+class TodoItem(
+    name: String,
+    icon: TodoIcon,
+) {
+    var name:String
+    var icon:TodoIcon
+
+    init {
+        this.name = name
+        this.icon = icon
+    }
+}
+
+fun generateRandomTodoItem() :TodoItem {
+    val message = listOf(
+        "Number 1,it is ok",
+        "Number 2,it is not ok",
+        "Number 3,it is not ok",
+        "Number 4,it is ok",
+        "Number 5,it is not ok",
+    ).random()
+
+    val icon = TodoIcon.values().random()
+
+    return TodoItem(message,icon)
+}
+
+class TodoViewModel :ViewModel() {
+    private var _todoItems = MutableLiveData(listOf<TodoItem>())
+    val todoItems: LiveData<List<TodoItem>> = _todoItems
+    fun addItem(item: TodoItem) {
+        _todoItems.value = _todoItems.value!! + listOf(item)
+    }
+
+    fun  removeItem(item: TodoItem) {
+        _todoItems.value = _todoItems.value!!.toMutableList().also {
+            it.remove(item)
         }
     }
 }
