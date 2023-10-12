@@ -109,6 +109,22 @@ fun main() {
     }
     callingEatFood(bird)
     callingEatFood(fish)
+
+    //匿名函数与lambda
+    doSomeThing()
+    doSomeThingThenBack()
+    funValue()
+    funValue1()
+    funValue2(1)
+    funValue3(3)
+
+    //不能传递函数给高阶函数，而是传递参数,参数是匿名函数,或者函数引用(两个冒号）
+//    outFun(3, inFun(name = "Jame", age = 35))
+    outFun(3, ::inFun)
+
+    //依据lambda规则：匿名函数是最后一个参数时移动到函数体中
+    outFun(3,{name,age -> "$name+$age"})
+    outFun(3) { name, age -> "$name+$age" }
 }
 
 fun sum(item1:Int,item2:Int):Int {
@@ -242,4 +258,43 @@ class Fish:AnimalInterface {
         println("Fish is eating food")
     }
 }
+//
+//var  lambda1 = () -> {
+//    println("lambda1")
+//}
 
+interface funInterface {
+    fun echo()
+}
+
+//funInterface lam1 = ()->{ println("hello") }
+//Unit表示函数没有返回值
+fun doSomeThing():Unit{
+    println("do something")
+}
+fun doSomeThingThenBack():String{
+    println("do something then back")
+    return "back"
+}
+
+//变量类型是函数，使用匿名函数来赋值
+var funValue:()->String = {"this is a function"}
+//变量类型是函数，使用匿名函数来赋值,省略变量类型
+var funValue1 = {"this is a function"}
+
+//变量类型是函数，使用匿名函数来赋值
+var funValue2:(values:Int)->String ={values ->  "this is a function,param:$values"}
+
+//变量类型是函数，使用匿名函数来赋值,省略了参数，只有一个参数时使用it代替参数
+var funValue3:(values:Int)->String ={ "this is a function,param:$it"}
+
+//高阶函数:函数的参数或者返回值是其它的函数，相当把函数当作数值来使用
+fun inFun(name:String,age: Int):String {
+    return name+age
+}
+
+fun outFun(id:Int,type:(String,Int)->String) {
+    val age = (1..10).random()
+    println(inFun("Sam ",age))
+    println("id: $id, type: $type")
+}
