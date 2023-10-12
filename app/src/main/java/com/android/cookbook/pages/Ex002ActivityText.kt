@@ -167,7 +167,7 @@ fun KindsOfText() {
             }
         )
 
-        inputText()
+        InputText()
     }
 }
 
@@ -175,7 +175,7 @@ fun KindsOfText() {
 @Preview
 @Composable
 @ExperimentalMaterial3Api
-fun inputText() {
+fun InputText() {
      var text by remember { mutableStateOf("") }
 
     Column {
