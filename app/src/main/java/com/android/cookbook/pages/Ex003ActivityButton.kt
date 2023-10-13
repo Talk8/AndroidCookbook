@@ -74,6 +74,8 @@ class Ex003ActivityButton : ComponentActivity() {
 @Preview(showBackground = true)
 @Composable
 fun ExButton() {
+    //语法不同，不过功能相同，推荐第二种语法，by关键字会自动调用getter/setter语法操作变量
+//    var textContent = remember { mutableStateOf("default") }
     var textContent by remember { mutableStateOf("default") }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
