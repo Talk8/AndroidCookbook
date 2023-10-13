@@ -3,4 +3,5 @@
     <string name="title_activity_ex001_layout_and_page">Ex001ActivityLayoutAndPage</string>
     <string name="str_hello">Hello Compose,hello android,hello world</string>
     <string name="title_activity_ex002_text">Ex002ActivityText</string>
+    <string name="title_activity_ex003_button">Ex003ActivityButton</string>
 </resources>
