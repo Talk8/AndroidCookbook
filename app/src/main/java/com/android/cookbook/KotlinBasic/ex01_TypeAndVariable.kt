@@ -268,9 +268,15 @@ interface funInterface {
 }
 
 //funInterface lam1 = ()->{ println("hello") }
-//Unit表示函数没有返回值
+//Unit表示函数返回类型是Unit，它是一个空类型，相当于java中的void,表示函数没有返回值，是否在函数中返回内容是可选的,
+// 而Nothing表示空类型，有返回值
 fun doSomeThing():Unit{
     println("do something")
+}
+
+fun doSomeThingNo():Nothing{
+    println("do something no")
+    return 0 as Nothing
 }
 fun doSomeThingThenBack():String{
     println("do something then back")
@@ -281,17 +287,25 @@ fun doSomeThingThenBack():String{
 var funValue:()->String = {"this is a function"}
 //变量类型是函数，使用匿名函数来赋值,省略变量类型
 var funValue1 = {"this is a function"}
+//只有一行语句时花括号也可以省略
+var funValue11 = "this is a function"
 
-//变量类型是函数，使用匿名函数来赋值
-var funValue2:(values:Int)->String ={values ->  "this is a function,param:$values"}
-
-//变量类型是函数，使用匿名函数来赋值,省略了参数，只有一个参数时使用it代替参数
-var funValue3:(values:Int)->String ={ "this is a function,param:$it"}
+//变量类型是函数，函数有参数，但是无返回值，使用匿名函数来赋值,这做做法也叫类型实例化
+var funValue2:(values:Int)->Unit ={values ->  "this is a function,param:$values"}
+//变量类型是函数，函数有参数和返回值，使用匿名函数来赋值
+var funValue3:(values:Int)->String ={values ->  "this is a function,param:$values"}
+//变量类型是函数，使用匿名函数来赋值,省略了参数，只有一个参数时使用it代替参数,it是单个参数的隐式名称
+var funValue31:(values:Int)->String ={ "this is a function,param:$it"}
+var funValue32:(values:Int)->String ={ "this is a function,param:$it" }
 
 //高阶函数:函数的参数或者返回值是其它的函数，相当把函数当作数值来使用
 fun inFun(name:String,age: Int):String {
     return name+age
 }
+//只有一行语句时可以省略大括号和return
+fun inFun1(name:String,age: Int):String = name+age
+//返回类型可以通过类型推导出来，也可以省略
+fun inFun2(name:String,age: Int) = name+age
 
 fun outFun(id:Int,type:(String,Int)->String) {
     val age = (1..10).random()
