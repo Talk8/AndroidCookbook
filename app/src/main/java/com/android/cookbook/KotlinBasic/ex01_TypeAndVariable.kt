@@ -307,8 +307,26 @@ fun inFun1(name:String,age: Int):String = name+age
 //返回类型可以通过类型推导出来，也可以省略
 fun inFun2(name:String,age: Int) = name+age
 
-fun outFun(id:Int,type:(String,Int)->String) {
+//函数的第二个参数是函数类型
+fun outFun(id:Int,type:(s:String,a:Int)->String):String {
     val age = (1..10).random()
     println(inFun("Sam ",age))
     println("id: $id, type: $type")
+    return "age = $age"
 }
+
+//通过函数引用把命名函数（具名函数）inFun1当作参数传递给outFun函数
+var res = outFun(3, ::inFun1)
+//把匿名函数当作参数传递给outFun函数,注意关键字fun不能省略
+var res1 = outFun(33,fun(s:String,a:Int):String{return "str = $s ,$a"})
+
+//使用lambda表达式代替匿名函数，把lambda表达式传递给outFun函数
+//注意lambda必须使用花括号包起来，箭头前是参数，箭头后是函数体
+//注意匿名函数的return不能省略，lambda的可以省略，而且通常是最后一个表达式的值
+var res2= outFun(33,{s:String,a:Int->"str = $s ,$a"})
+//省略lambda表达式中的参数类型，返回类型，return关键字
+var res3= outFun(33,{s,a->"str = $s ,$a"})
+//函数的最后一参数是lambda时可以将其移动到括号外面(这叫尾lambda)
+var res4= outFun(33){s,a->"str = $s ,$a"}
+
+
