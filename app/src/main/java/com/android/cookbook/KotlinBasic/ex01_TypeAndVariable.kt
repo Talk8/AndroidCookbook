@@ -124,6 +124,10 @@ fun main() {
     //依据lambda规则：匿名函数是最后一个参数时移动到函数体中
     outFun(3,{name,age -> "$name+$age"})
     outFun(3) { name, age -> "$name+$age" }
+
+    //枚举,默认值是从0开始依次累加，也可以给枚举指定值，然后再获取值，
+    println("enum name: ${ExWeek.SUN},value: ${ExWeek.SUN.ordinal}") //enum name: SUN,value: 6
+    println("enum name: ${ExWeek.SUN},value: ${ExWeek.SUN.getDayValue()}")//enum name: SUN,value: 7
 }
 
 fun sum(item1:Int,item2:Int):Int {
@@ -336,3 +340,17 @@ var res3= outFun(33,{s,a->"str = $s ,$a"})
 var res4= outFun(33){s,a->"str = $s ,$a"}
 
 
+//定义枚举并且给枚举指定值，也可以不指定值
+enum class ExWeek(private val day:Int) {
+    MON(1),
+    TUR(2),
+    WED(3),
+    THU(4),
+    FRI(5),
+    SAR(6),
+    SUN(7); //注意这时是个分号用来分隔枚举常量与成员函数
+    //添加一个函数用来获取枚举常量指定的值
+    fun getDayValue():Int{
+        return day
+    }
+}
