@@ -4,4 +4,6 @@
     <string name="str_hello">Hello Compose,hello android,hello world</string>
     <string name="title_activity_ex002_text">Ex002ActivityText</string>
     <string name="title_activity_ex003_button">Ex003ActivityButton</string>
+    <string name="title_activity_ex004_progress">Ex004ActivityProgress</string>
+    <string name="title_activity_ex005_scaffold">Ex005ActivityScaffold</string>
 </resources>
