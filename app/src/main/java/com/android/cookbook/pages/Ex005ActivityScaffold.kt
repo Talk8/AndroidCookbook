@@ -14,15 +14,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
@@ -44,10 +48,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
 import com.android.cookbook.pages.ui.theme.CookbookTheme
 import com.android.cookbook.pages.ui.theme.CusColor
 
@@ -145,6 +152,8 @@ fun customAppBar() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun customCenterAppBar() {
+    var actionClicked by remember { mutableStateOf(false) }
+
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.smallTopAppBarColors(
             containerColor = Color.Blue,
@@ -159,14 +168,18 @@ fun customCenterAppBar() {
                 contentDescription = null
             )
         },
+        //默认显示图标，点击时修改状态，然后显示popupmenu,同时隐藏图标
         actions = {
-            IconButton(
-                onClick = { }){
-                Icon(
-                    imageVector = Icons.Default.MoreVert,
-                    contentDescription = null
-                )
-            }
+            if(actionClicked)
+                ShowPopupMenu()
+            else
+                IconButton(
+                    onClick = { actionClicked = true }){
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = null
+                    )
+                }
         }
     )
 }
@@ -306,6 +319,7 @@ fun CustomBottomNavigationBar() {
     }
 }
 
+//自定义的FloatingActionButton
 @Composable
 fun CustomFAB() {
     ExtendedFloatingActionButton(
@@ -313,4 +327,42 @@ fun CustomFAB() {
         icon = { Icon(imageVector = Icons.Default.Add,
         contentDescription = null) },
         onClick = { })
+}
+
+//自定义的popupMenu，通过可以组合函数DropdownMenu实现，同时实现了点击功能，不过没有给item添加具体的功能
+@Composable
+fun ShowPopupMenu() {
+    //是否显示popupMenu,默认显示
+    var show by remember { mutableStateOf(true) }
+
+    //菜单中显示的内容：包含图标和文字
+    val items = listOf<NavigationItem>(
+        NavigationItem("One",Icons.Default.Done),
+        NavigationItem("Two",Icons.Default.Done),
+        NavigationItem("Three",Icons.Default.Done),
+    )
+
+    if (show)
+        DropdownMenu(
+            //是否显示菜单
+            expanded = show,
+            //控制菜单的弹出位置，向左和向下进行偏移
+            offset = DpOffset(x = 20.dp, y = 30.dp),
+            onDismissRequest = {  }) {
+            Column() {
+                items.forEachIndexed { index, item ->
+                    //这个菜单项目比较好，封装了图标、文本和点击事件
+                        DropdownMenuItem(
+                            leadingIcon = { Icon(imageVector = item.icon, contentDescription = null)},
+                            text = { Text(text = item.text) },
+                            //点击任意菜单项目时，菜单消失
+                            onClick = { show = false})
+                }
+            }
+        }
+    else
+        //action第二次点击弹出菜单，第一次点击在scaffold中控制
+        IconButton(onClick = { show = true}) {
+            Icon(imageVector = Icons.Default.MoreVert, contentDescription = null)
+        }
 }
