@@ -348,7 +348,8 @@ fun ShowPopupMenu() {
             expanded = show,
             //控制菜单的弹出位置，向左和向下进行偏移
             offset = DpOffset(x = 20.dp, y = 30.dp),
-            onDismissRequest = {  }) {
+            //点击菜单外任意位置时，菜单消失
+            onDismissRequest = { show = false }) {
             Column() {
                 items.forEachIndexed { index, item ->
                     //这个菜单项目比较好，封装了图标、文本和点击事件
