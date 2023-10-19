@@ -184,7 +184,7 @@ fun customCenterAppBar() {
     )
 }
 
-//BottomNavigationBar,需要自己组合其它函数来实现，我组合的是Row布局和IconButton
+//BottomAppBar,需要自己组合其它函数来实现，我组合的是Row布局和IconButton
 @Composable
 fun customBottomBar() {
     BottomAppBar(
