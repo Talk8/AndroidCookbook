@@ -231,6 +231,7 @@ data class NavigationItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomBottomNavigationBar() {
+    //定义一个状态值，在切换bar时使用
     var selectedItem by remember { mutableStateOf(0) }
 
     val items = listOf<NavigationItem>(
@@ -245,7 +246,7 @@ fun CustomBottomNavigationBar() {
     ) {
         items.forEachIndexed { index, item ->
             NavigationBarItem(
-                //通过
+                //通过状态值来确定当前bar是否被选中
                 selected = selectedItem == index,
                 onClick = { selectedItem = index },
                 //设置bar上的图标
