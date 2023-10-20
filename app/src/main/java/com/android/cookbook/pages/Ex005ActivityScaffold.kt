@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -55,6 +56,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.android.cookbook.pages.ui.theme.CookbookTheme
 import com.android.cookbook.pages.ui.theme.CusColor
 
@@ -240,15 +246,80 @@ fun CustomBottomNavigationBar() {
         NavigationItem("Setting",Icons.Default.Settings),
     )
 
+    val  naviController = rememberNavController()
+    NavHost(
+        navController = naviController,
+        startDestination = "PersonPage") {
+
+        composable("Scaffold") {
+            ExScaffold()
+        }
+
+        composable("PersonPage") {
+           PersonPage()
+        }
+
+        composable("HomePage") {
+            HomePage()
+        }
+
+        composable("SettingPage") {
+            SettingPage()
+        }
+    }
+
+
     NavigationBar(
         containerColor = Color.Blue,
         contentColor = Color.Green, //这个颜色不起作用
     ) {
+        val navBackStackEntry by naviController.currentBackStackEntryAsState()
+        val currentDestination = navBackStackEntry?.destination
+
         items.forEachIndexed { index, item ->
             NavigationBarItem(
                 //通过状态值来确定当前bar是否被选中
                 selected = selectedItem == index,
-                onClick = { selectedItem = index },
+                onClick = {
+                    selectedItem = index
+                    if(index == 0)
+                    naviController.navigate("PersonPage") {
+                        //点击Item时清空栈内到NavOptionBuilder.pupUpTo id之间所有的item
+                        popUpTo(naviController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+
+                        //避免多次点击Item时产生多个实例
+                        launchSingleTop = true
+                        //再次点击Item时恢复状态
+                        restoreState = true
+                    }
+                    else if (index == 1)
+                        naviController.navigate("HomePage") {
+                            //点击Item时清空栈内到NavOptionBuilder.pupUpTo id之间所有的item
+                            popUpTo(naviController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+
+                            //避免多次点击Item时产生多个实例
+                            launchSingleTop = true
+                            //再次点击Item时恢复状态
+                            restoreState = true
+                        }
+                    else
+                        naviController.navigate("SettingPage") {
+                            //点击Item时清空栈内到NavOptionBuilder.pupUpTo id之间所有的item
+                            popUpTo(naviController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+
+                            //避免多次点击Item时产生多个实例
+                            launchSingleTop = true
+                            //再次点击Item时恢复状态
+                            restoreState = true
+                        }
+
+                          },
                 //设置bar上的图标
                 icon = {
                     //在bar的图标上创建小红点,不过不能调整小红点的位置
@@ -367,4 +438,37 @@ fun ShowPopupMenu() {
         IconButton(onClick = { show = true}) {
             Icon(imageVector = Icons.Default.MoreVert, contentDescription = null)
         }
+}
+
+@Composable
+fun PersonPage() {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(Color.Cyan),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(text = "This is page of person")
+    }
+}
+
+@Composable
+fun HomePage() {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(Color.Cyan),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(text = "This is page of Home")
+    }
+}
+
+@Composable
+fun SettingPage() {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(Color.Cyan),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(text = "This is page of Setting")
+    }
 }
