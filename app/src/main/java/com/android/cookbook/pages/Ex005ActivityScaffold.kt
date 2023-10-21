@@ -20,7 +20,6 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.BottomAppBar
@@ -49,18 +48,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.node.modifierElementOf
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Popup
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.Navigation
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.android.cookbook.R
 import com.android.cookbook.pages.ui.theme.CookbookTheme
 import com.android.cookbook.pages.ui.theme.CusColor
 
@@ -90,6 +93,10 @@ class Ex005ActivityScaffold : ComponentActivity() {
 @Composable
 fun ExScaffold(
 ) {
+
+    //这个NavController主要用来切换底部的导航，只能在这里获取，不能在底部导航的方法中获取，不会导航栏会出现在屏幕上方
+    val  naviController = rememberNavController()
+
     Scaffold(
         //这个color也不起作用
         modifier = Modifier.background(color = MaterialTheme.colorScheme.primary),
@@ -97,7 +104,8 @@ fun ExScaffold(
         topBar = { customCenterAppBar()},
 
 //        bottomBar = { customBottomBar() },
-        bottomBar = { CustomBottomNavigationBar() },
+//        bottomBar = { CustomBottomNavigationBar(naviController) },
+        bottomBar = { BottomNaviBarTemplate(navController = naviController)},
 
         //控制FAB的位置,只有两种
         floatingActionButtonPosition = FabPosition.End,
@@ -110,6 +118,37 @@ fun ExScaffold(
             .background(color = CusColor)
         ) {
             Text(text = "hello")
+        }
+
+        //NavHost容器中包含所有的导航页面，只能在这里获取，不能在底部导航的方法中获取，不会导航栏会出现在屏幕上方
+        //这个是自定义的页面配合自定义的底部导航栏使用:CustomBottomNavigationBar
+        /*
+        NavHost(
+            navController = naviController,
+            startDestination = "PersonPage") {
+
+            composable("PersonPage") {
+                PersonPage()
+            }
+
+            composable("HomePage") {
+                HomePage()
+            }
+
+            composable("SettingPage") {
+                SettingPage()
+            }
+        }
+         */
+        //这个navHost容器是配合BottomNaviBarTemplate使用的，可以当作代码模板
+        NavHost(
+            navController = naviController,
+            startDestination = BottomNaviScreen.HomeScreen.route,
+            modifier = Modifier.padding(innerPadding),
+        ) {
+            composable(BottomNaviScreen.PersonScreen.route) { PersonScreen(naviController)}
+            composable(BottomNaviScreen.HomeScreen.route) { HomeScreen(naviController) }
+            composable(BottomNaviScreen.SettingScreen.route) { SettingScreen(naviController) }
         }
     }
 }
@@ -236,7 +275,7 @@ data class NavigationItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CustomBottomNavigationBar() {
+fun CustomBottomNavigationBar(naviController: NavController) {
     //定义一个状态值，在切换bar时使用
     var selectedItem by remember { mutableStateOf(0) }
 
@@ -246,33 +285,35 @@ fun CustomBottomNavigationBar() {
         NavigationItem("Setting",Icons.Default.Settings),
     )
 
-    val  naviController = rememberNavController()
-    NavHost(
-        navController = naviController,
-        startDestination = "PersonPage") {
-
-        composable("Scaffold") {
-            ExScaffold()
-        }
-
-        composable("PersonPage") {
-           PersonPage()
-        }
-
-        composable("HomePage") {
-            HomePage()
-        }
-
-        composable("SettingPage") {
-            SettingPage()
-        }
-    }
+    //不能在这里获取naviController和设置NavHost,否则导航栏出现在屏幕最上方
+//    val  naviController = rememberNavController()
+//    NavHost(
+//        navController = naviController,
+//        startDestination = "PersonPage") {
+//
+////        composable("Scaffold") {
+////            ExScaffold()
+////        }
+//
+//        composable("PersonPage") {
+//           PersonPage()
+//        }
+//
+//        composable("HomePage") {
+//            HomePage()
+//        }
+//
+//        composable("SettingPage") {
+//            SettingPage()
+//        }
+//    }
 
 
     NavigationBar(
         containerColor = Color.Blue,
         contentColor = Color.Green, //这个颜色不起作用
     ) {
+        //获取当前的navigation
         val navBackStackEntry by naviController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
 
@@ -282,44 +323,47 @@ fun CustomBottomNavigationBar() {
                 selected = selectedItem == index,
                 onClick = {
                     selectedItem = index
-                    if(index == 0)
-                    naviController.navigate("PersonPage") {
-                        //点击Item时清空栈内到NavOptionBuilder.pupUpTo id之间所有的item
-                        popUpTo(naviController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
 
-                        //避免多次点击Item时产生多个实例
-                        launchSingleTop = true
-                        //再次点击Item时恢复状态
-                        restoreState = true
+                    when (index) {
+                        0 -> naviController.navigate("PersonPage") {
+                //                    naviController.navigate(currentDestination.toString()) {
+                            //点击Item时清空栈内到NavOptionBuilder.pupUpTo id之间所有的item
+                            //相当于返回到导航堆栈的起始页面并且把当前页面到起始页面之间的其它导航信息移出堆栈
+                //                        popUpTo("Person") //和下面的代码效果相同
+                            popUpTo(naviController.graph.findStartDestination().id) {
+                                saveState = true
+                //                            inclusive = true
+                            }
+
+                            //避免多次点击Item时产生多个实例
+                            launchSingleTop = true
+                            //再次点击Item时恢复状态
+                            restoreState = true
+                        }
+                        1 -> naviController.navigate("HomePage") {
+                            //点击Item时清空栈内到NavOptionBuilder.pupUpTo id之间所有的item
+                            popUpTo(naviController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+
+                            //避免多次点击Item时产生多个实例
+                            launchSingleTop = true
+                            //再次点击Item时恢复状态
+                            restoreState = true
+                        }
+                        else -> naviController.navigate("SettingPage") {
+                            //点击Item时清空栈内到NavOptionBuilder.pupUpTo id之间所有的item
+                            popUpTo(naviController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+
+                            //避免多次点击Item时产生多个实例
+                            launchSingleTop = true
+                            //再次点击Item时恢复状态
+                            restoreState = true
+                        }
                     }
-                    else if (index == 1)
-                        naviController.navigate("HomePage") {
-                            //点击Item时清空栈内到NavOptionBuilder.pupUpTo id之间所有的item
-                            popUpTo(naviController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-
-                            //避免多次点击Item时产生多个实例
-                            launchSingleTop = true
-                            //再次点击Item时恢复状态
-                            restoreState = true
-                        }
-                    else
-                        naviController.navigate("SettingPage") {
-                            //点击Item时清空栈内到NavOptionBuilder.pupUpTo id之间所有的item
-                            popUpTo(naviController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-
-                            //避免多次点击Item时产生多个实例
-                            launchSingleTop = true
-                            //再次点击Item时恢复状态
-                            restoreState = true
-                        }
-
-                          },
+                },
                 //设置bar上的图标
                 icon = {
                     //在bar的图标上创建小红点,不过不能调整小红点的位置
@@ -444,7 +488,7 @@ fun ShowPopupMenu() {
 fun PersonPage() {
     Box(modifier = Modifier
         .fillMaxSize()
-        .background(Color.Cyan),
+        .background(Color.White),
         contentAlignment = Alignment.Center,
     ) {
         Text(text = "This is page of person")
@@ -455,7 +499,7 @@ fun PersonPage() {
 fun HomePage() {
     Box(modifier = Modifier
         .fillMaxSize()
-        .background(Color.Cyan),
+        .background(Color.White),
         contentAlignment = Alignment.Center,
     ) {
         Text(text = "This is page of Home")
@@ -466,9 +510,86 @@ fun HomePage() {
 fun SettingPage() {
     Box(modifier = Modifier
         .fillMaxSize()
-        .background(Color.Cyan),
+        .background(Color.White),
         contentAlignment = Alignment.Center,
     ) {
         Text(text = "This is page of Setting")
+    }
+}
+
+//参考官方文档编写，compose中习惯把页面叫screen,而在Flutter中习惯叫page,因此在代码中screen和page的含义相同
+//我在CustomBottomNavigationBar创建导航栏在切换标签时有屏幕闪烁，这个模板则没有，差别就在这个sealed class上
+sealed class BottomNaviScreen(val route:String, val resourceId:Int,val icon:ImageVector) {
+    object PersonScreen : BottomNaviScreen("person", R.string.navi_person,Icons.Default.Person)
+    object HomeScreen : BottomNaviScreen("home",R.string.navi_home,Icons.Default.Home)
+    object SettingScreen: BottomNaviScreen("setting",R.string.navi_setting,Icons.Default.Settings)
+}
+
+//创建底部导航栏的模板代码
+@Composable
+fun BottomNaviBarTemplate(navController: NavController) {
+    val screens = listOf(
+        BottomNaviScreen.PersonScreen,
+        BottomNaviScreen.HomeScreen,
+        BottomNaviScreen.SettingScreen,
+    )
+
+    NavigationBar(
+        containerColor = Color.Blue,
+        contentColor = Color.Green, //这个颜色不起作用
+    ) {
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentDestination = navBackStackEntry?.destination
+
+        screens.forEach { item ->
+            NavigationBarItem(
+                icon = { Icon(imageVector = item.icon, contentDescription = null)},
+                label = { Text(text = stringResource(id = item.resourceId))},
+                selected = currentDestination?.hierarchy?.any{it.route == item.route} == true,
+                onClick = {
+                    navController.navigate(item.route) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                //设置bar的各种颜色
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = Color.Cyan,
+                    selectedTextColor = Color.Cyan,
+                    //这个颜色最好和NavigationBar的containerColor颜色保持一致，不然会在Icon外层显示一个背景颜色
+                    indicatorColor = Color.Blue,
+                    unselectedIconColor = Color.Yellow,
+                    unselectedTextColor = Color.Yellow,
+                ),
+            )
+        }
+    }
+}
+
+@Composable
+fun PersonScreen(naviController: NavController) {
+    Box (
+        modifier = Modifier.fillMaxSize().background(color = Color.Cyan),
+        contentAlignment = Alignment.Center){
+        Text(text = "Person Screen")
+    }
+}
+@Composable
+fun HomeScreen(naviController: NavController) {
+    Box (
+        modifier = Modifier.fillMaxSize().background(color = Color.Magenta),
+        contentAlignment = Alignment.Center){
+        Text(text = "Home Screen")
+    }
+}
+@Composable
+fun SettingScreen(naviController: NavController) {
+    Box (
+        modifier = Modifier.fillMaxSize().background(color = Color.LightGray),
+        contentAlignment = Alignment.Center){
+        Text(text = "Setting Screen")
     }
 }
