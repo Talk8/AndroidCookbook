@@ -39,6 +39,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -109,7 +111,6 @@ fun MainFramework (navController: NavController) {
     Scaffold(
         topBar = {
                  TopAppBar(
-                     modifier = Modifier.background(color = MaterialTheme.colorScheme.error),
                      //这样仍然无法居中显示
                      title = {
                          Box(contentAlignment = Alignment.Center) {
@@ -175,16 +176,48 @@ fun HomePage(padding:PaddingValues,navController: NavController) {
                     tint = Color.Blue,
                     imageVector = Icons.Default.Check , contentDescription = null)
 
+                //TextButton的文字无法居中
                 TextButton(
-                    modifier = Modifier.weight(9f),
+                    modifier = Modifier
+                        .weight(9f)
+                        .background(color = Color.Cyan),
                     onClick = {
                        navController.navigate(screen.route)
 //                        navController.navigate("button")
                     }) {
-                    Text(text = screen.description)
+                    Text(text = (index+1).toString()+": "+screen.description, style = TextStyle(textAlign = TextAlign.Start))
                 }
             }
         }
+        //尝试三种方法都无法让TextButton中的文本向左对齐
+        //通过Text的属性，无法让Text向左对齐
+        //在Text外嵌套一层行或者列也无法让Text向左对齐
+        //修改modify也无法让Text向左对齐
+//        TextButton(
+//            modifier = Modifier
+//                .background(color = Color.Yellow)
+//                .align(Alignment.Start),
+//            onClick = {}) {
+//            Row(
+//                horizontalArrangement = Arrangement.SpaceBetween
+//            ) {
+//                Text(
+//                    modifier = Modifier.background(color = Color.Green),
+//                    text = "test", style = TextStyle(textAlign = TextAlign.Start),
+//                    textAlign = TextAlign.Start
+//                )
+//                Text(
+//                    modifier = Modifier.background(color = Color.Red),
+//                    text = "     ", style = TextStyle(textAlign = TextAlign.Start),
+//                    textAlign = TextAlign.Start
+//                )
+//                Text(
+//                    modifier = Modifier.background(color = Color.Blue),
+//                    text = "     ", style = TextStyle(textAlign = TextAlign.Start),
+//                    textAlign = TextAlign.Start
+//                )
+//            }
+//        }
     }
         //WR,自动创建row,WC自动创建column
         //comp自动创建组合函数
