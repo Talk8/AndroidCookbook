@@ -114,7 +114,7 @@ fun ExScaffold(
         //这个color也不起作用
         modifier = Modifier.background(color = MaterialTheme.colorScheme.primary),
 //        topBar = { customAppBar() },
-        topBar = { customCenterAppBar()},
+        topBar = { CustomCenterAppBar()},
 
 //        bottomBar = { customBottomBar() },
 //        bottomBar = { CustomBottomNavigationBar(naviController) },
@@ -174,7 +174,7 @@ fun ExScaffold(
 //使用TopAppBar组合函数，除了无法让title居中外，其它的都可以正常使用
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun customAppBar() {
+fun CustomAppBar() {
     TopAppBar(
         colors = TopAppBarDefaults.smallTopAppBarColors(
             containerColor = Color.Blue,
@@ -214,7 +214,7 @@ fun customAppBar() {
 //使用CenterAlignedTopAppBar组合函数，可以让title居中，其它的用法与上一个函数完全相同
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun customCenterAppBar() {
+fun CustomCenterAppBar() {
     var actionClicked by remember { mutableStateOf(false) }
 
     CenterAlignedTopAppBar(
@@ -249,7 +249,7 @@ fun customCenterAppBar() {
 
 //BottomAppBar,需要自己组合其它函数来实现，我组合的是Row布局和IconButton
 @Composable
-fun customBottomBar() {
+fun CustomBottomBar() {
     BottomAppBar(
         //控制高度，背景颜色和内容颜色
         modifier = Modifier.height(64.dp) ,
@@ -297,7 +297,7 @@ fun CustomBottomNavigationBar(naviController: NavController) {
     //定义一个状态值，在切换bar时使用
     var selectedItem by remember { mutableStateOf(0) }
 
-    val items = listOf<NavigationItem>(
+    val items = listOf(
         NavigationItem("Person",Icons.Default.Person),
         NavigationItem("Home",Icons.Default.Home),
         NavigationItem("Setting",Icons.Default.Settings),
@@ -333,7 +333,7 @@ fun CustomBottomNavigationBar(naviController: NavController) {
     ) {
         //获取当前的navigation
         val navBackStackEntry by naviController.currentBackStackEntryAsState()
-        val currentDestination = navBackStackEntry?.destination
+//        val currentDestination = navBackStackEntry?.destination
 
         items.forEachIndexed { index, item ->
             NavigationBarItem(
@@ -470,7 +470,7 @@ fun ShowPopupMenu() {
     var show by remember { mutableStateOf(true) }
 
     //菜单中显示的内容：包含图标和文字
-    val items = listOf<NavigationItem>(
+    val items = listOf(
         NavigationItem("One",Icons.Default.Done),
         NavigationItem("Two",Icons.Default.Done),
         NavigationItem("Three",Icons.Default.Done),
@@ -623,7 +623,7 @@ fun SettingScreen(naviController: NavController) {
 fun showSnackBar(snackbarHostState: SnackbarHostState, scope:CoroutineScope) {
 
    scope.launch {
-       var result = snackbarHostState.showSnackbar(
+       val result = snackbarHostState.showSnackbar(
            message = "content of SnackBar",
 //           actionLabel = "action",
            withDismissAction = true,
