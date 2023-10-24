@@ -357,6 +357,8 @@ fun AppNavigation() {
             MainFramework(navController)
         }
 
+        //composable函数不起作用时手动添加导航，否则使用下面的循环自动添加导航图
+        /*
         composable(ScreenData.screeList[0].route) {
             LayoutPage()
         }
@@ -376,16 +378,18 @@ fun AppNavigation() {
             ExScaffold()
         }
 
+
+         */
         //这种赋值形式正确，但是无法导航到正确页面，原因是composable函数传递来后没有效果，进入空白页面，换成注释掉的代码就可以
-        /*
+        //在composable函数后面加上括号就可以了
         ScreenData.screeList.forEach { screen ->
             composable(screen.route) {
 //                ExButton()
 //                Text(text = "hello")
-                screen.composableFun
+                //原来使用screen.composableFun,没有效果，加上括号就可以了
+                screen.composableFun()
             }
         }
-         */
 
         //在导航中通过参数传递数据，dataParam是个占位符,
         composable("exButton/{dataParam}",

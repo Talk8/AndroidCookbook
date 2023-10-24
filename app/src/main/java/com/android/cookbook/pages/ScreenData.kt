@@ -20,8 +20,9 @@ class ScreenData {
 
     companion object {
         //创建路由的string中不能包含/这种反斜线,最后一个参数不起作用，估计是类型有问题，我感觉向二级指针一样操作就会好
-        //添加新页面是需要在这里和MainActivity中的navHost中添加路径和导航图
-        val  screeList = listOf<Screens>(
+        //在composable函数后面加上括号就可以,这样就可以自动通过循环添加导航图了，不再需要手动添加导航图
+        //如何使用手动添加导航图的模式，那么添加新页面是需要在这里和MainActivity中的navHost中添加路径和导航图，
+        val  screeList = listOf(
         Screens("ex001: Layout and Pages","layout") { LayoutPage() },
         Screens("ex002: Test and TextField","text") { KindsOfText() },
         Screens("ex003: All kinds of Button","button") { ExButton() },
