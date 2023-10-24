@@ -2,12 +2,10 @@ package com.android.cookbook
 
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,12 +14,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.ClickableText
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Check
@@ -44,28 +38,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.modifier.modifierLocalConsumer
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.android.cookbook.pages.ExButton
+import com.android.cookbook.pages.ExProgress
+import com.android.cookbook.pages.ExScaffold
+import com.android.cookbook.pages.KindsOfText
+import com.android.cookbook.pages.LayoutPage
+import com.android.cookbook.pages.ScreenData
 import com.android.cookbook.ui.theme.CookbookTheme
-import kotlinx.coroutines.selects.select
-import java.lang.reflect.Type
-import kotlin.math.log
 
 class MainActivity : ComponentActivity() {
 
@@ -73,6 +63,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             CookbookTheme {
                 // A surface container using the 'background' color from the theme
@@ -80,10 +71,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-
-
-                        MainFramework()
+                    AppNavigation()
 //                    TodoActivityScreen()
+//                    MainFramework()
                 }
             }
         }
@@ -113,80 +103,91 @@ class MainActivity : ComponentActivity() {
 
 
 
-@Preview
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun MainFramework () {
+fun MainFramework (navController: NavController) {
     Scaffold(
         topBar = {
                  TopAppBar(
-                     modifier = Modifier.background(color = MaterialTheme.colorScheme.primary),
+                     modifier = Modifier.background(color = MaterialTheme.colorScheme.error),
                      //这样仍然无法居中显示
                      title = {
                          Box(contentAlignment = Alignment.Center) {
-                             Text(text = "title")
+                             Text(text = " Example of Jetpack Compose")
                          }
                      },
                      navigationIcon = { Icon(imageVector = Icons.Default.Menu, contentDescription = null)},
                      actions = {
                          IconButton(
                              onClick = { Log.d("tag","bt clicked") }) {
-                             Icon(imageVector = Icons.Default.Share, contentDescription = null)
+                             Icon(imageVector = Icons.Default.MoreVert, contentDescription = null)
                          }
                      }
                  )
         },
         bottomBar = {},
     ) {contentPadding ->
-        HomePage(padding = contentPadding)
+        HomePage(padding = contentPadding, navController = navController)
+
+        //如果在当前页获取navController然后再添加navHost，那么跳转到其它页面时scaffold的topBar会一直存在
+//        NavHost(
+//            navController = navController,
+//            startDestination = "home" ) {
+
+            //程序主页
+//            composable("home") {
+//                HomePage(padding = contentPadding, navController = navController)
+//            }
+//        composable(ScreenData.screeList[1].route) {
+//            ExButton()
+//        }
+//        composable(ScreenData.screeList[2].route) {
+//            ScreenData.screeList[2].composableFun
+//        }
+//        composable(ScreenData.screeList[3].route) {
+//            ScreenData.screeList[3].composableFun
+//        }
+//        composable("button") {
+//            ExButton()
+//        }
+//        }
     }
 }
 
-@OptIn(ExperimentalUnitApi::class)
 @Composable
-fun HomePage(padding:PaddingValues) {
-    //用来存放目录，这些目录会显示到按钮上
-     val contentList = listOf(
-        "ex001: Layout and Pages",
-        "ex001: Layout and Pages",
-        "ex001: Layout and Pages",
-        "ex001: Layout and Pages",
-    )
+fun HomePage(padding:PaddingValues,navController: NavController) {
 
     Column(
         modifier = Modifier
             .padding(padding)
+            .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.background),
     ) {
-        for (item in contentList) {
-            //如何文字和图标对齐:修改Row的verticalAlignment参数值
+        ScreenData.screeList.forEachIndexed { index, screen ->
             Row(
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp)) {
+                modifier = Modifier .padding(start = 16.dp, end = 16.dp)) {
                 Icon(
                     modifier = Modifier
                         .weight(1f)
                         .background(color = Color.White),//这里修改的是图标背景颜色，tint可以修改图标颜色
                     tint = Color.Blue,
-                    imageVector = Icons.Default.Check, contentDescription =null )
+                    imageVector = Icons.Default.Check , contentDescription = null)
+
                 TextButton(
                     modifier = Modifier.weight(9f),
                     onClick = {
-                    //按钮事件就用来跳转页面
-                    Log.d("a", "ex $item")
-
-                }) {
-                    Text(text = item)
+                       navController.navigate(screen.route)
+//                        navController.navigate("button")
+                    }) {
+                    Text(text = screen.description)
                 }
             }
         }
     }
-
         //WR,自动创建row,WC自动创建column
         //comp自动创建组合函数
-
 }
 
 
@@ -306,6 +307,68 @@ class TodoViewModel :ViewModel() {
     fun  removeItem(item: TodoItem) {
         _todoItems.value = _todoItems.value!!.toMutableList().also {
             it.remove(item)
+        }
+    }
+}
+
+@Composable
+fun AppNavigation() {
+    val navController = rememberNavController()
+
+    NavHost(
+        navController = navController,
+        startDestination = "home" ) {
+
+        //程序主页
+        composable("home") {
+            MainFramework(navController)
+        }
+
+        composable(ScreenData.screeList[0].route) {
+            LayoutPage()
+        }
+
+        composable(ScreenData.screeList[1].route) {
+            KindsOfText()
+        }
+        composable(ScreenData.screeList[2].route) {
+//            ScreenData.screeList[2].composableFun
+            ExButton()
+        }
+        composable(ScreenData.screeList[3].route) {
+//            ScreenData.screeList[3].composableFun
+            ExProgress()
+        }
+        composable(ScreenData.screeList[4].route) {
+            ExScaffold()
+        }
+
+        //这种赋值形式正确，但是无法导航到正确页面，原因是composable函数传递来后没有效果，进入空白页面，换成注释掉的代码就可以
+        /*
+        ScreenData.screeList.forEach { screen ->
+            composable(screen.route) {
+//                ExButton()
+//                Text(text = "hello")
+                screen.composableFun
+            }
+        }
+         */
+
+        //在导航中通过参数传递数据，dataParam是个占位符,
+        composable("exButton/{dataParam}",
+            //把被传递的数据存放在参数中，使用了navArgument()方法，这里指定了默认值，调用navigate方法传入真实数据
+            arguments = listOf(
+                navArgument(name = "dataParam") {
+                    type = NavType.StringType
+                    defaultValue = "it is a default data"
+                    nullable = true
+                }
+            )
+        ) {
+            //从导航参数中获取数据，这里的it是lambda中的参数，它的类型是NavBackStackEntry类型
+            val data = it.arguments?.getString("dataParam")?:"no data"
+            println(data)
+            ExButton()
         }
     }
 }
