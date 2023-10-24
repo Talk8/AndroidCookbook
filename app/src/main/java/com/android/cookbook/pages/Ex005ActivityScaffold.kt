@@ -1,5 +1,6 @@
 package com.android.cookbook.pages
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,10 +13,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
@@ -37,6 +40,12 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarData
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -45,12 +54,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.node.modifierElementOf
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
@@ -58,7 +68,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.Navigation
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -66,6 +75,8 @@ import androidx.navigation.compose.rememberNavController
 import com.android.cookbook.R
 import com.android.cookbook.pages.ui.theme.CookbookTheme
 import com.android.cookbook.pages.ui.theme.CusColor
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class Ex005ActivityScaffold : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -96,6 +107,8 @@ fun ExScaffold(
 
     //这个NavController主要用来切换底部的导航，只能在这里获取，不能在底部导航的方法中获取，不会导航栏会出现在屏幕上方
     val  naviController = rememberNavController()
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
         //这个color也不起作用
@@ -109,7 +122,12 @@ fun ExScaffold(
 
         //控制FAB的位置,只有两种
         floatingActionButtonPosition = FabPosition.End,
-        floatingActionButton = { CustomFAB() }
+        floatingActionButton = { CustomFAB(snackbarHostState, scope) },
+        //如果有浮动按钮时，他位于FAB上方位置
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) {
+            snackbarData ->
+            CusSnackBar(snackbarData = snackbarData)
+        } }
 
     ) {innerPadding->
         Column(modifier = Modifier
@@ -435,14 +453,14 @@ fun CustomBottomNavigationBar(naviController: NavController) {
     }
 }
 
-//自定义的FloatingActionButton
+//自定义的FloatingActionButton,点击FAB时弹出snackBar
 @Composable
-fun CustomFAB() {
+fun CustomFAB(snackbarHostState: SnackbarHostState,scope: CoroutineScope) {
     ExtendedFloatingActionButton(
         text = { Text(text = "Add") },
         icon = { Icon(imageVector = Icons.Default.Add,
         contentDescription = null) },
-        onClick = { })
+        onClick = { showSnackBar(snackbarHostState = snackbarHostState, scope = scope)})
 }
 
 //自定义的popupMenu，通过可以组合函数DropdownMenu实现，同时实现了点击功能，不过没有给item添加具体的功能
@@ -471,7 +489,7 @@ fun ShowPopupMenu() {
                     //这个菜单项目比较好，封装了图标、文本和点击事件
                         DropdownMenuItem(
                             leadingIcon = { Icon(imageVector = item.icon, contentDescription = null)},
-                            text = { Text(text = item.text) },
+                            text = { Text(text = (index+1).toString()+item.text) },
                             //点击任意菜单项目时，菜单消失
                             onClick = { show = false})
                 }
@@ -572,7 +590,9 @@ fun BottomNaviBarTemplate(navController: NavController) {
 @Composable
 fun PersonScreen(naviController: NavController) {
     Box (
-        modifier = Modifier.fillMaxSize().background(color = Color.Cyan),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Color.Cyan),
         contentAlignment = Alignment.Center){
         Text(text = "Person Screen")
     }
@@ -580,7 +600,9 @@ fun PersonScreen(naviController: NavController) {
 @Composable
 fun HomeScreen(naviController: NavController) {
     Box (
-        modifier = Modifier.fillMaxSize().background(color = Color.Magenta),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Color.Magenta),
         contentAlignment = Alignment.Center){
         Text(text = "Home Screen")
     }
@@ -588,8 +610,53 @@ fun HomeScreen(naviController: NavController) {
 @Composable
 fun SettingScreen(naviController: NavController) {
     Box (
-        modifier = Modifier.fillMaxSize().background(color = Color.LightGray),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Color.LightGray),
         contentAlignment = Alignment.Center){
         Text(text = "Setting Screen")
+    }
+}
+
+//通过SnackbarHostState的showSnackbar方法显示SnackBar
+@SuppressLint("CoroutineCreationDuringComposition")
+fun showSnackBar(snackbarHostState: SnackbarHostState, scope:CoroutineScope) {
+
+   scope.launch {
+       var result = snackbarHostState.showSnackbar(
+           message = "content of SnackBar",
+//           actionLabel = "action",
+           withDismissAction = true,
+           duration = SnackbarDuration.Short)
+
+       when(result) {
+           SnackbarResult.ActionPerformed -> {
+           }
+
+           SnackbarResult.Dismissed -> {
+           }
+       }
+
+   }
+}
+
+//自定义的SnackBar,默认是黑色的背景的窗口，使用该内容后会可覆盖掉showSnackBar中的参数
+@Composable
+fun CusSnackBar(snackbarData: SnackbarData) {
+    Snackbar(
+        modifier = Modifier.padding(horizontal = 16.dp)
+            .clip(CircleShape), //可以剪裁成椭圆形
+        //窗口中内容的颜色
+        contentColor = Color.White,
+        //窗口中背景的颜色,这个颜色接近默认的背景颜色
+        containerColor = Color.DarkGray,
+        //默认是一个X图标，在窗口最右侧显示
+        action = { Icon(imageVector = Icons.Default.Edit, contentDescription = null)},
+    ) {
+        Column {
+            Text(text = "this is the 1 content of snackBar")
+            Text(text = "this is the 2 content of snackBar")
+            Text(text = "this is the 3 content of snackBar")
+        }
     }
 }
