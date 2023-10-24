@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/navi_all"
+    app:startDestination="@id/mainActivity">
+
+
+    <activity
+        android:id="@+id/mainActivity"
+        android:name="com.android.cookbook.MainActivity"
+        android:label="MainActivity">
+
+        <action
+            android:id="@+id/next_action"
+            app:popUpTo="@id/ex001ActivityLayoutAndPage"
+            />
+    </activity>
+    <activity
+        android:id="@+id/ex001ActivityLayoutAndPage"
+        android:name="com.android.cookbook.pages.Ex001ActivityLayoutAndPage"
+        android:label="Ex001ActivityLayoutAndPage" />
+    <activity
+        android:id="@+id/ex002ActivityText"
+        android:name="com.android.cookbook.pages.Ex002ActivityText"
+        android:label="Ex002ActivityText" />
+
+</navigation>

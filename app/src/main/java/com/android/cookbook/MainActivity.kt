@@ -179,8 +179,8 @@ fun HomePage(padding:PaddingValues,navController: NavController) {
                 //TextButton的文字无法居中
                 TextButton(
                     modifier = Modifier
-                        .weight(9f)
-                        .background(color = Color.Cyan),
+                        .weight(9f),
+//                        .background(color = Color.Cyan),
                     onClick = {
                        navController.navigate(screen.route)
 //                        navController.navigate("button")

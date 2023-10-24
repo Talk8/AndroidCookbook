@@ -184,6 +184,8 @@ fun foreachLoop() {
 open class Animal(n:String,i:Int) {
     constructor() : this("default",0)
     //类的成员变量,默认生成getter/setter
+    //如果构造方法前加上关键字val/var修饰参数，那么可以省略这两个类属性的定义,语法如下：
+    //open class Animal(val n:String,val i:Int) {
     var name:String
     var id:Int
     init {

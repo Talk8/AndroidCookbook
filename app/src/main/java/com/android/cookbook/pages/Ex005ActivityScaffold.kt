@@ -107,8 +107,11 @@ fun ExScaffold(
 
     //这个NavController主要用来切换底部的导航，只能在这里获取，不能在底部导航的方法中获取，不会导航栏会出现在屏幕上方
     val  naviController = rememberNavController()
+    //显示SnackBar时使用
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    //显示BottomSheet时使用,文档中建议使用ModalBottomSheet,不过这个可组合函数
 
     Scaffold(
         //这个color也不起作用
@@ -644,7 +647,8 @@ fun showSnackBar(snackbarHostState: SnackbarHostState, scope:CoroutineScope) {
 @Composable
 fun CusSnackBar(snackbarData: SnackbarData) {
     Snackbar(
-        modifier = Modifier.padding(horizontal = 16.dp)
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
             .clip(CircleShape), //可以剪裁成椭圆形
         //窗口中内容的颜色
         contentColor = Color.White,
