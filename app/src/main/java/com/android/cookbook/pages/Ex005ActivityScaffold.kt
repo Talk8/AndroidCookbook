@@ -127,6 +127,7 @@ fun ExScaffold(
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = { CustomFAB(snackbarHostState, scope) },
         //如果有浮动按钮时，他位于FAB上方位置
+        //最后的CusSnackBar可以不添加，如果不添加使用默认的snackbar
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) {
             snackbarData ->
             CusSnackBar(snackbarData = snackbarData)
@@ -626,11 +627,15 @@ fun SettingScreen(naviController: NavController) {
 fun showSnackBar(snackbarHostState: SnackbarHostState, scope:CoroutineScope) {
 
    scope.launch {
+       //如果snackbarHost中指定了snackBar就会用指定的SnackBar覆盖默认的snackBar以及下面参数中的信息
        val result = snackbarHostState.showSnackbar(
+           //snackBar中显示的信息
            message = "content of SnackBar",
 //           actionLabel = "action",
+           //是否显示Action图标，默认是一个X图标
            withDismissAction = true,
-           duration = SnackbarDuration.Short)
+           //snackBar的显示时间
+           duration = SnackbarDuration.Long)
 
        when(result) {
            SnackbarResult.ActionPerformed -> {
