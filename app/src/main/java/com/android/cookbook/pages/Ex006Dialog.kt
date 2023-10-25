@@ -1,0 +1,102 @@
+package com.android.cookbook.pages
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.window.DialogProperties
+import com.android.cookbook.ui.theme.Purple80
+import java.time.format.TextStyle
+
+class Ex006Dialog {
+    @Composable
+    fun ExDialog(
+        onDismissRequest:  () ->Unit,
+        onConfirmation:() -> Unit,
+        title: String,
+        message: String,
+        icon: ImageVector
+    ) {
+
+        AlertDialog(
+            icon = { Icon(imageVector = icon, contentDescription = null)},
+            title = { Text(text = title)},
+            text = { Text(text = message)},
+            //控制dialog中文字，标题、图标的颜色,不过没有包含底部yes/no两个文字的颜色
+            containerColor = Color.LightGray,
+            textContentColor = Color.Black,
+            titleContentColor = Color.Red,
+            iconContentColor = Color.Yellow,
+            //这两个值用来控制点击dialog区域外时,dialog是否会消失，默认值为true
+            properties = DialogProperties(
+                dismissOnClickOutside = false,
+                dismissOnBackPress = false,
+            ),
+            onDismissRequest = {onConfirmation()},
+            confirmButton = {
+                TextButton(onClick = {onConfirmation()}) {
+                    Text(text = "Yes")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {onDismissRequest()}) {
+                    Text(text = "No",color = Color.Black )
+                }
+            }
+        )
+    }
+
+    @Composable
+    fun ShowDialog(showDialog:MutableState<Boolean>){
+        when {
+            showDialog.value -> {
+                ExDialog(
+                    onDismissRequest = {  showDialog.value = false},
+                    onConfirmation = { showDialog.value = false },
+                    title = "Title of AlertDialog",
+                    message = "Message of AlertDialog",
+                    icon = Icons.Default.Warning
+                )
+            }
+        }
+    }
+
+    @Preview(showBackground = true)
+    @Composable
+    fun DialogScreenMain() {
+        Surface(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            val showDialog = remember { mutableStateOf(false) }
+
+            Column (
+                horizontalAlignment = Alignment.CenterHorizontally,
+                    ){
+                //点击按钮显示图标
+                ElevatedButton(onClick = {
+                    showDialog.value = true
+                }) {
+                    Text(text = "Show Dialog")
+                }
+
+                ShowDialog(showDialog)
+            }
+        }
+    }
+}
