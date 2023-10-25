@@ -14,12 +14,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
@@ -32,7 +33,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -52,10 +52,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.android.cookbook.pages.ExButton
-import com.android.cookbook.pages.ExProgress
-import com.android.cookbook.pages.ExScaffold
-import com.android.cookbook.pages.KindsOfText
-import com.android.cookbook.pages.LayoutPage
 import com.android.cookbook.pages.ScreenData
 import com.android.cookbook.ui.theme.CookbookTheme
 
@@ -168,25 +164,35 @@ fun HomePage(padding:PaddingValues,navController: NavController) {
             Row(
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier .padding(start = 16.dp, end = 16.dp)) {
+                modifier = Modifier.height(48.dp)
+                    .padding(start = 16.dp, end = 16.dp)) {
                 Icon(
                     modifier = Modifier
                         .weight(1f)
                         .background(color = Color.White),//这里修改的是图标背景颜色，tint可以修改图标颜色
                     tint = Color.Blue,
-                    imageVector = Icons.Default.Check , contentDescription = null)
+                    imageVector = Icons.Default.KeyboardArrowRight, contentDescription = null)
 
                 //TextButton的文字无法居中
+                /*
                 TextButton(
                     modifier = Modifier
                         .weight(9f),
-//                        .background(color = Color.Cyan),
                     onClick = {
                        navController.navigate(screen.route)
-//                        navController.navigate("button")
                     }) {
                     Text(text = (index+1).toString()+": "+screen.description, style = TextStyle(textAlign = TextAlign.Start))
                 }
+                 */
+                //TextButton中的text无法居中，给Text添加点击事件来替代
+                Text(
+                    modifier = Modifier.weight(9f)
+                        .padding(start = 8.dp)
+//                        .background(color = Color.Yellow)
+                        .clickable { navController.navigate(screen.route) },
+                    text = (index+1).toString()+": "+screen.description, style = TextStyle(textAlign = TextAlign.Start),
+                    textAlign = TextAlign.Start
+                )
             }
         }
         //尝试三种方法都无法让TextButton中的文本向左对齐
@@ -233,7 +239,7 @@ fun TodoScreen(
 ) {
 
     val count = items.size
-    Column() {
+    Column{
 
         LazyColumn(
             modifier = Modifier

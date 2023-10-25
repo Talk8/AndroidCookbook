@@ -1,8 +1,11 @@
 package com.android.cookbook.pages
 
 import android.widget.Toast
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
@@ -20,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.DialogProperties
 
@@ -86,7 +90,7 @@ import androidx.compose.ui.window.DialogProperties
 
             Column (
                 horizontalAlignment = Alignment.CenterHorizontally,
-                    ){
+                verticalArrangement = Arrangement.SpaceAround){
                 //点击按钮显示图标
                 ElevatedButton(onClick = {
                     showDialog.value = true
@@ -104,6 +108,14 @@ import androidx.compose.ui.window.DialogProperties
                     Text(text = "Show Toast")
                 }
 
+                //TextButton中的text无法居中，给Text添加点击事件来替代
+                Text(
+                    modifier = Modifier.fillMaxWidth()
+//                        .background(color = Color.Yellow)
+                        .clickable { Toast.makeText(context,"Text is Clicked",Toast.LENGTH_SHORT).show() },
+                    text = "click me ",
+                    textAlign = TextAlign.Start
+                )
             }
         }
     }
