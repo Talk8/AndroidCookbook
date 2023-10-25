@@ -1,6 +1,5 @@
 package com.android.cookbook.pages
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
@@ -21,10 +20,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.DialogProperties
-import com.android.cookbook.ui.theme.Purple80
-import java.time.format.TextStyle
 
-class Ex006Dialog {
+
     @Composable
     fun ExDialog(
         onDismissRequest:  () ->Unit,
@@ -99,4 +96,3 @@ class Ex006Dialog {
             }
         }
     }
-}
