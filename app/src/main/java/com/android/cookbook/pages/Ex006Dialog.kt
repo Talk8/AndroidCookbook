@@ -1,5 +1,6 @@
 package com.android.cookbook.pages
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
@@ -18,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.DialogProperties
 
@@ -93,6 +95,15 @@ import androidx.compose.ui.window.DialogProperties
                 }
 
                 ShowDialog(showDialog)
+
+                //点击按钮显示Toast,尽量使用SnackBar来替代Toast
+                val context = LocalContext.current
+                ElevatedButton(onClick = {
+                    Toast.makeText(context,"Hello Toast",Toast.LENGTH_SHORT).show()
+                }) {
+                    Text(text = "Show Toast")
+                }
+
             }
         }
     }

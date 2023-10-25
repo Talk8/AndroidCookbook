@@ -28,7 +28,7 @@ class ScreenData {
             Screens("ex003: All kinds of Button", "button") { ExButton() },
             Screens("ex004: Progress", "progress") { ExProgress() },
             Screens("ex005: All Scaffold content", "scaffold") { ExScaffold() },
-            Screens("ex006: Dialog ", "dialog") { DialogScreenMain()},
+            Screens("ex006: Dialog and Toast ", "dialog") { DialogScreenMain()},
         )
     }
 }
