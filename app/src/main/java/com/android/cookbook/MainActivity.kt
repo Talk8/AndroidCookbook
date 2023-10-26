@@ -35,6 +35,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,6 +52,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.android.cookbook.navigation.LocalNavController
 import com.android.cookbook.pages.ExButton
 import com.android.cookbook.pages.ScreenData
 import com.android.cookbook.ui.theme.CookbookTheme
@@ -164,7 +166,8 @@ fun HomePage(padding:PaddingValues,navController: NavController) {
             Row(
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.height(48.dp)
+                modifier = Modifier
+                    .height(48.dp)
                     .padding(start = 16.dp, end = 16.dp)) {
                 Icon(
                     modifier = Modifier
@@ -186,10 +189,17 @@ fun HomePage(padding:PaddingValues,navController: NavController) {
                  */
                 //TextButton中的text无法居中，给Text添加点击事件来替代
                 Text(
-                    modifier = Modifier.weight(9f)
+                    modifier = Modifier
+                        .weight(9f)
                         .padding(start = 8.dp)
 //                        .background(color = Color.Yellow)
-                        .clickable { navController.navigate(screen.route) },
+                        .clickable {
+                            navController.navigate(screen.route) {
+                                //这个home是写死的，表示主页，也可以通过navController获取主页
+//                                popUpTo("home")
+                                popUpTo(navController.graph.startDestinationId)
+                            }
+                        },
                     text = (index+1).toString()+": "+screen.description, style = TextStyle(textAlign = TextAlign.Start),
                     textAlign = TextAlign.Start
                 )
@@ -354,7 +364,12 @@ class TodoViewModel :ViewModel() {
 fun AppNavigation() {
     val navController = rememberNavController()
 
-    NavHost(
+    //为了在各个页面之间传递LocalProvider,页面中使用LocalNavController.current获取当前的navController
+    CompositionLocalProvider(
+        LocalNavController provides navController,
+//        LocalBackPressedDispatcher provides onBack
+    ) {
+     NavHost(
         navController = navController,
         startDestination = "home" ) {
 
@@ -414,4 +429,6 @@ fun AppNavigation() {
             ExButton()
         }
     }
+    }
+
 }

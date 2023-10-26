@@ -4,13 +4,17 @@ import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -24,9 +28,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.DialogProperties
+import com.android.cookbook.navigation.LocalNavController
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Ex006DialogScreen(title: String) {
+
+    //获取当前的NavController,主要用来返回上一级菜单
+    val navController = LocalNavController.current
+
+    Scaffold(
+        topBar = { CommonCenterAppBar(title, navController = navController) },
+    ) { innerPadding ->
+       DialogScreenMain(innerPadding)
+    }
+}
 
     @Composable
     fun ExDialog(
@@ -80,11 +97,12 @@ import androidx.compose.ui.window.DialogProperties
         }
     }
 
-    @Preview(showBackground = true)
     @Composable
-    fun DialogScreenMain() {
+    fun DialogScreenMain(innerPadding:PaddingValues) {
         Surface(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
         ) {
             val showDialog = remember { mutableStateOf(false) }
 
@@ -110,9 +128,14 @@ import androidx.compose.ui.window.DialogProperties
 
                 //TextButton中的text无法居中，给Text添加点击事件来替代
                 Text(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
 //                        .background(color = Color.Yellow)
-                        .clickable { Toast.makeText(context,"Text is Clicked",Toast.LENGTH_SHORT).show() },
+                        .clickable {
+                            Toast
+                                .makeText(context, "Text is Clicked", Toast.LENGTH_SHORT)
+                                .show()
+                        },
                     text = "click me ",
                     textAlign = TextAlign.Start
                 )
