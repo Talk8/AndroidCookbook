@@ -570,10 +570,14 @@ fun BottomNaviBarTemplate(navController: NavController) {
                 selected = currentDestination?.hierarchy?.any{it.route == item.route} == true,
                 onClick = {
                     navController.navigate(item.route) {
+                        //popup to the start destination of the graph to avoid building up a large
+                        //stack of destinations on the back stack as users select items.
                         popUpTo(navController.graph.startDestinationId) {
                             saveState = true
                         }
+                        // avoid multiple copies of the same destination when reselecting the same item
                         launchSingleTop = true
+                        //restore state when reselecting a previously selected item
                         restoreState = true
                     }
                 },
