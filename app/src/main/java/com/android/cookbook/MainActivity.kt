@@ -365,6 +365,7 @@ fun AppNavigation() {
     val navController = rememberNavController()
 
     //为了在各个页面之间传递LocalProvider,页面中使用LocalNavController.current获取当前的navController
+    //可以反CompositionLocal理解为一种数据共享方式，作用域以树状形式展开，下面的代码是初始化LocalNavController
     CompositionLocalProvider(
         LocalNavController provides navController,
 //        LocalBackPressedDispatcher provides onBack
