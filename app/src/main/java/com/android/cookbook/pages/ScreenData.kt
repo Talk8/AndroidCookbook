@@ -30,6 +30,7 @@ class ScreenData {
             Screens("ex005: All Scaffold content", "scaffold") { ExScaffold() },
 //            Screens("ex006: Dialog and Toast ", "dialog") { DialogScreenMain()},
             Screens("ex006: Dialog and Toast ", "dialog") { Ex006DialogScreen("Dialog example")},
+            Screens("ex007: Kinds of list", "list") { Ex007ListScreen("List example") },
         )
     }
 }
