@@ -10,18 +10,24 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +41,9 @@ import androidx.compose.ui.unit.dp
 import com.android.cookbook.navigation.LocalNavController
 import kotlin.math.roundToInt
 
+//事件主要分点击和拖动，点击又分单击，双击，长按。
+//官方文档称xxxable修饰符为高级事件，带有涟漪效果，xxxGestures修饰符为低级事件
+//低级事件中可以获取到坐标偏移值，高级事件则不能
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,7 +77,7 @@ fun EventMainScreen(paddingValue:PaddingValues) {
             Modifier.clickable { str = "clicked" },
             text = str)
 
-        //combinedClickable修饰符可以检测双击，长按事件
+        //combinedClickable修饰符可以检测双击，长按事件,官方文档中没有介绍此接口
         Text(modifier =
             Modifier.combinedClickable(
                 onClick = {str = "onClicked"},
@@ -80,10 +89,11 @@ fun EventMainScreen(paddingValue:PaddingValues) {
 
         //pointerInput修饰符用来检测tap和drag手势
         Text(modifier = Modifier.pointerInput(Unit) { detectTapGestures(
-            //先运行onPress再运行onTap
-            onTap = { str = "onTap"},
+            //先运行onPress再运行onTap,onPress相当于View中的EventDown,onTap相当于Up
+            //通过参数offset可以获取到偏移值
+            onTap = { offset -> str = "onTap: $offset" },
             onDoubleTap = {str = "onDoubleTap"},
-            onPress = {str = "onPress"},
+            onPress = {offset -> str = "onPress: $offset"},
             onLongPress = {str = "onLongPress"}
         ) },
             text = str)
@@ -127,9 +137,48 @@ fun EventMainScreen(paddingValue:PaddingValues) {
                 text ="Drag"
             )
         }
+        //滑动(swip)事件,官方文档中还有这方面的知识，API中提示is deprecated,这里不做介绍
 
-        //添加滑动swip事件
-        //添加滚动动事件
+        //滚动修饰符有3种：verticalScroll、horizontalScroll和scrollable,前两个是高级修饰符，可以滚动被修饰的组件，
+        //最后一个是低级的组件，不能滑动组件，但是可以获取到滚动的偏移值
+
+        //滚动动事件,当前显示内容无法全部在区域内显示时才可以滑动
+        //还有一个水平滚动修饰符horizontalScroll()，用法相同，不做介绍
+        val scrollState = rememberScrollState()
+        //指定滚动到的位置，这个值与滚动区域的大小有关，也就是代码中的120dp
+        LaunchedEffect(Unit) { scrollState.animateScrollTo(60)}
+
+        Column(
+            modifier = Modifier
+                .height(120.dp) //限定区域大小
+                .background(color = Color.LightGray)
+//                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
+        ) {
+           repeat(5) {
+               Text(
+                   modifier = Modifier.padding(8.dp),
+                   text = "This is No: $it")
+           }
+        }
+
+        //通过ScrollableState修饰符获取滚动的偏移值
+        var scrollOffset by remember { mutableStateOf(0f)}
+        Box(modifier = Modifier
+            .height(80.dp)
+            .scrollable(
+                orientation = Orientation.Vertical,
+                state = rememberScrollableState { consumeScrollDelta ->
+                    scrollOffset += consumeScrollDelta
+                    consumeScrollDelta
+                }
+            )
+        ) { //在文本上显示滚动偏移值
+            Text(text = if(scrollOffset == 0f) "ScrollableState"
+                else scrollOffset.toString())
+        }
+
+        //滚动修饰符自带嵌套功能也可以通过nestedScroll修饰符指定嵌套相关的功能，以后有时间再文档，我觉得它类似Flutter中的Sliver
 
         //多点解控
     }
