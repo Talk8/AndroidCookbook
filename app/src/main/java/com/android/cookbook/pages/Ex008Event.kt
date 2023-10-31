@@ -38,6 +38,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -188,6 +190,7 @@ fun EventMainScreen(paddingValue:PaddingValues) {
         //滚动修饰符自带嵌套功能也可以通过nestedScroll修饰符指定嵌套相关的功能，以后有时间再文档，我觉得它类似Flutter中的Sliver
 
         //多点解控:平移，缩放，旋转，这些功能主要通过transformable修饰符和TransformableState这个状态实现，操作时需要双指操作才可以
+        //这些事件可以单独使用，也可以综合使用
         var scale by remember { mutableStateOf(1f) }
         var rotation by remember { mutableStateOf(0f) }
         var offset by remember { mutableStateOf(Offset.Zero) }
@@ -208,6 +211,8 @@ fun EventMainScreen(paddingValue:PaddingValues) {
                     translationX = offset.x,
                     translationY = offset.y
                 )
+//                .rotate(rotation)
+//                .scale(scale)
                 .transformable(state = state)
                 .background(color = Color.Red)
                 .size(80.dp)
