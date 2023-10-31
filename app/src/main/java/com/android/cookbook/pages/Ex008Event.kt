@@ -11,7 +11,9 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +24,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -34,8 +37,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.android.cookbook.navigation.LocalNavController
@@ -180,7 +187,31 @@ fun EventMainScreen(paddingValue:PaddingValues) {
 
         //滚动修饰符自带嵌套功能也可以通过nestedScroll修饰符指定嵌套相关的功能，以后有时间再文档，我觉得它类似Flutter中的Sliver
 
-        //多点解控
+        //多点解控:平移，缩放，旋转，这些功能主要通过transformable修饰符和TransformableState这个状态实现，操作时需要双指操作才可以
+        var scale by remember { mutableStateOf(1f) }
+        var rotation by remember { mutableStateOf(0f) }
+        var offset by remember { mutableStateOf(Offset.Zero) }
+        val state = rememberTransformableState {
+            zoomChange: Float, panChange: Offset, rotationChange: Float ->
+            scale *= zoomChange
+            rotation += rotationChange
+            offset += panChange
+        }
+
+        //可以使用graphicsLayer修饰符传入各个参值，也可以单独使用scale,rotation等修饰符
+        Box(
+            modifier = Modifier
+                .graphicsLayer(
+                    scaleX = scale,
+                    scaleY = scale,
+                    rotationZ = rotation,
+                    translationX = offset.x,
+                    translationY = offset.y
+                )
+                .transformable(state = state)
+                .background(color = Color.Red)
+                .size(80.dp)
+        )
     }
 
 }
