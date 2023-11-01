@@ -31,7 +31,8 @@ class ScreenData {
 //            Screens("ex006: Dialog and Toast ", "dialog") { DialogScreenMain()},
             Screens("ex006: Dialog and Toast ", "dialog") { Ex006DialogScreen("Dialog example")},
             Screens("ex007: Kinds of list", "list") { Ex007ListScreen("List example") },
-            Screens("ex008: Event and Gesture", "list") { Ex008EventScreen("Event example") },
+            Screens("ex008: Event and Gesture", "event") { Ex008EventScreen("Event example") },
+            Screens("ex009: Slider ", "slider") { Ex009SliderScreen("Slider example") },
         )
     }
 }
