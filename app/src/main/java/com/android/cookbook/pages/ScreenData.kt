@@ -34,6 +34,7 @@ class ScreenData {
             Screens("ex008: Event and Gesture", "event") { Ex008EventScreen("Event example") },
             Screens("ex009: Slider ", "slider") { Ex009SliderScreen("Slider example") },
             Screens("ex010: Switch", "switch") { Ex010SwitchScreen("Switch example") },
+            Screens("ex011: Card", "card") { Ex011CardScreen("Card example") },
         )
     }
 }
