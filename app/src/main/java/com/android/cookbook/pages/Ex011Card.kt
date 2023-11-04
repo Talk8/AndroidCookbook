@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -50,12 +51,17 @@ fun CardMainScreen(paddingValues: PaddingValues) {
                 .background(color = Color.Blue)
                 .size(width = 300.dp, height = 100.dp)
                 .align(Alignment.CenterHorizontally),
+            //调整背景颜色
             colors = CardDefaults.cardColors(
                 containerColor = Color.Yellow,
                 contentColor = Color.Red
             ),
+            //修改圆角的大小
+            shape = RoundedCornerShape(18.dp),
+            //修改边框的男宽度和颜色
             border = BorderStroke(width = 2.dp, color = Color.Red),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            //调整阴影的范围
+            elevation = CardDefaults.cardElevation(defaultElevation = 88.dp)
         ) {
             Text(//两处对齐都不起作用
                 modifier = Modifier.padding(8.dp),
