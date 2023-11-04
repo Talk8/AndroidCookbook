@@ -27,7 +27,7 @@ import com.android.cookbook.navigation.LocalNavController
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Ex011CardScreen(title:String) {
-    var navController = LocalNavController.current
+    val navController = LocalNavController.current
 
     Scaffold(
         topBar = { CommonCenterAppBar(title = title, navController = navController)}
