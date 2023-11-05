@@ -107,12 +107,16 @@ fun GridsAnother() {
 @Composable
 fun GridWithCard() {
     var index: Int
-    LazyVerticalGrid(columns = GridCells.Fixed(3)) {
+    LazyVerticalGrid(columns = GridCells.Fixed(3),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
         items(count = 9,
 //            span = { GridItemSpan(it) },//通过span创建不规则的Grid，
             itemContent = {
             index = it+1
             //通过各种计算，card不适合放在Grid中，因为它的大小受Grid影响，会自动调节
+                //不过使用水平和垂直的参数后，可以有效地控制各个Card之间的间隔
             Card ( modifier = Modifier.size(40.dp),
             ){  //通过Box让Card中的内容居中显示
                 Box(modifier = Modifier.align(Alignment.CenterHorizontally)){
